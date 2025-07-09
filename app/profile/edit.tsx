@@ -33,7 +33,7 @@ export default function EditProfileScreen() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -55,7 +55,7 @@ export default function EditProfileScreen() {
 
   const currentUser = useQuery(
     api.auth.getCurrentUser,
-    user ? { userId: user.userId as Id<"users"> } : "skip"
+    user ? { userId: user.userId as Id<'users'> } : 'skip'
   );
 
   // const updateProfile = useMutation(api.candidates.updateCandidateProfile);
@@ -81,7 +81,7 @@ export default function EditProfileScreen() {
   //       linkedinUrl: candidateProfile.linkedinUrl || '',
   //       githubUrl: candidateProfile.githubUrl || '',
   //     });
-      
+
   //     if (currentUser.profileImage) {
   //       // In a real app, you'd get the image URL from storage
   //       setProfileImage(currentUser.profileImage);
@@ -96,7 +96,7 @@ export default function EditProfileScreen() {
         const parsedUser = JSON.parse(userData);
         if (parsedUser.role !== 'candidate') {
           Alert.alert('Access Denied', 'This section is for candidates only');
-          router.back();
+          router.replace('/dashboard/hr');
           return;
         }
         setUser(parsedUser);
@@ -110,14 +110,17 @@ export default function EditProfileScreen() {
   };
 
   const updateFormData = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const pickImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant camera roll permissions to upload a profile picture.');
+        Alert.alert(
+          'Permission Required',
+          'Please grant camera roll permissions to upload a profile picture.'
+        );
         return;
       }
 
@@ -131,8 +134,7 @@ export default function EditProfileScreen() {
       if (!result.canceled && result.assets[0]) {
         setProfileImage(result.assets[0].uri);
       }
-   
- } catch (error) {
+    } catch (error) {
       console.error('Error picking image:', error);
       Alert.alert('Error', 'Failed to pick image');
     }
@@ -162,19 +164,27 @@ export default function EditProfileScreen() {
   };
 
   const showImagePicker = () => {
-    Alert.alert(
-      'Profile Picture',
-      'Choose an option',
-      [
-        { text: 'Camera', onPress: takePhoto },
-        { text: 'Gallery', onPress: pickImage },
-        { text: 'Cancel', style: 'cancel' },
-      ]
-    );
+    Alert.alert('Profile Picture', 'Choose an option', [
+      { text: 'Camera', onPress: takePhoto },
+      { text: 'Gallery', onPress: pickImage },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   const handleSave = async () => {
-    const { firstName, lastName, email, phone, skills, experience, education, location, summary, linkedinUrl, githubUrl } = formData;
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      skills,
+      experience,
+      education,
+      location,
+      summary,
+      linkedinUrl,
+      githubUrl,
+    } = formData;
 
     if (!firstName || !lastName || !email) {
       Alert.alert('Error', 'Please fill in all required fields (Name and Email)');
@@ -195,7 +205,7 @@ export default function EditProfileScreen() {
     try {
       // Update user basic info
       await updateUser({
-        userId: user.userId as Id<"users">,
+        userId: user.userId as Id<'users'>,
         firstName,
         lastName,
         phone: phone || undefined,
@@ -204,8 +214,8 @@ export default function EditProfileScreen() {
       // Update candidate profile
       const skillsArray = skills
         .split(',')
-        .map(skill => skill.trim())
-        .filter(skill => skill.length > 0);
+        .map((skill) => skill.trim())
+        .filter((skill) => skill.length > 0);
 
       // await updateProfile({
       //   userId: user.userId as Id<"users">,
@@ -244,7 +254,7 @@ export default function EditProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <Header title="Edit Profile" showBack={true} />
@@ -271,7 +281,7 @@ export default function EditProfileScreen() {
             {/* Basic Information */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Basic Information</Text>
-              
+
               <View style={styles.row}>
                 <View style={[styles.inputContainer, styles.halfWidth]}>
                   <Text style={styles.label}>First Name *</Text>
@@ -323,7 +333,7 @@ export default function EditProfileScreen() {
             {/* Professional Information */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Professional Information</Text>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Skills</Text>
                 <TextInput
@@ -360,7 +370,6 @@ export default function EditProfileScreen() {
                 />
               </View>
 
-
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Location</Text>
                 <TextInput
@@ -390,7 +399,7 @@ export default function EditProfileScreen() {
             {/* Social Links */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Social Links</Text>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>LinkedIn URL</Text>
                 <TextInput
@@ -423,9 +432,7 @@ export default function EditProfileScreen() {
               onPress={handleSave}
               disabled={loading}
             >
-              <Text style={styles.saveButtonText}>
-                {loading ? 'Saving...' : 'Save Changes'}
-              </Text>
+              <Text style={styles.saveButtonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -496,8 +503,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   form: {
-    width
-: '100%',
+    width: '100%',
   },
   section: {
     marginBottom: 32,

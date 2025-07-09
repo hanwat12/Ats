@@ -1,6 +1,5 @@
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
-
+import { mutation, query } from './_generated/server';
+import { v } from 'convex/values';
 
 export const signup = mutation({
   args: {
@@ -8,46 +7,34 @@ export const signup = mutation({
     password: v.string(),
     firstName: v.string(),
     lastName: v.string(),
-    role: v.union(v.literal("admin"), v.literal("hr"), v.literal("candidate")),
+    role: v.union(v.literal('admin'), v.literal('hr')),
     phone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existingUser = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
       .unique();
 
     if (existingUser) {
-      throw new Error("User with this email already exists");
+      throw new Error('User with this email already exists');
     }
 
-    if (args.role === "admin") {
+    if (args.role === 'admin') {
       const existingAdmin = await ctx.db
-        .query("users")
-        .filter((q) => q.eq(q.field("role"), "admin"))
+        .query('users')
+        .filter((q) => q.eq(q.field('role'), 'admin'))
         .first();
 
       if (existingAdmin) {
-        throw new Error("An admin account already exists. Only one admin is allowed.");
+        throw new Error('An admin account already exists. Only one admin is allowed.');
       }
     }
 
-    
-    const userId = await ctx.db.insert("users", {
+    const userId = await ctx.db.insert('users', {
       ...args,
       createdAt: Date.now(),
     });
-
-    
-    if (args.role === "candidate") {
-      await ctx.db.insert("candidates", {
-        userId,
-        skills: [],
-        experience: 0,
-        education: "",
-        location: "",
-      });
-    }
 
     return { userId, role: args.role };
   },
@@ -60,12 +47,12 @@ export const login = mutation({
   },
   handler: async (ctx, args) => {
     const user = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
       .unique();
 
     if (!user || user.password !== args.password) {
-      throw new Error("Invalid email or password");
+      throw new Error('Invalid email or password');
     }
 
     return {
@@ -79,7 +66,7 @@ export const login = mutation({
 });
 
 export const getCurrentUser = query({
-  args: { userId: v.id("users") },
+  args: { userId: v.id('users') },
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
     if (!user) return null;
@@ -101,10 +88,9 @@ export const getCurrentUser = query({
   },
 });
 
-
 export const updateUser = mutation({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
     phone: v.optional(v.string()),

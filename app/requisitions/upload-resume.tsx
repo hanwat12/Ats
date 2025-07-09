@@ -64,7 +64,7 @@ export default function UploadResumeScreen() {
           parsedUser.role !== 'hr' &&
           parsedUser.role !== 'admin'
         ) {
-          Alert.alert('Access Denied', 'Only candidates, HR, and Admin can upload resumes');
+          Alert.alert('Access Denied', 'Only  HR can upload resumes');
           router.back();
           return;
         }
@@ -173,7 +173,7 @@ export default function UploadResumeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <Header title="Upload Resume" showBack={true} />

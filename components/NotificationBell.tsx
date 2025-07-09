@@ -11,8 +11,8 @@ interface NotificationBellProps {
 }
 
 export default function NotificationBell({ userId, onPress }: NotificationBellProps) {
-  const unreadCount = useQuery(api.notifications.getUnreadCount, { 
-    userId: userId as Id<"users"> 
+  const unreadCount = useQuery(api.notifications.getUnreadCount, {
+    userId: userId as Id<'users'>,
   });
 
   return (
@@ -20,9 +20,7 @@ export default function NotificationBell({ userId, onPress }: NotificationBellPr
       <Ionicons name="notifications" size={24} color="#1F2937" />
       {unreadCount && unreadCount > 0 && (
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {unreadCount > 99 ? '99+' : unreadCount.toString()}
-          </Text>
+          <Text style={styles.badgeText}>{unreadCount > 99 ? '99+' : unreadCount.toString()}</Text>
         </View>
       )}
     </TouchableOpacity>

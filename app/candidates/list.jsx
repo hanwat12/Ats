@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Alert,
   TextInput,
+  Modal,
 } from 'react-native';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -17,30 +18,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/components/Header';
 
-/**
- * @typedef {Object} User
- * @property {string} userId
- * @property {string} role
- * @property {string} firstName
- * @property {string} lastName
- * @property {string} email
- */
-
 export default function CandidateListScreen() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showJobSelection, setShowJobSelection] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
 
-  const candidates = useQuery(api.candidates.getAllCandidates);
-  const applications = useQuery(api.applications.getAllApplications); // You may need to implement this API
-
-  const candidatesWithApplications = applications?.map(app => ({
-    ...app.candidate, // candidate details
-    jobTitle: app.job.title,
-    appliedAt: app.appliedAt,
-    resumeUrl: app.resumeUrl,
-    coverLetter: app.coverLetter,
-  })) || [];
+  const candidates = useQuery(api.candidate.getAllCandidates);
+  const recentApplications = useQuery(api.applications.getAllApplicationsForHR);
+  const jobs = useQuery(api.jobs.getAllJobs);
 
   useEffect(() => {
     loadUserData();
@@ -72,19 +60,49 @@ export default function CandidateListScreen() {
   };
 
   const filteredCandidates = candidates?.filter(candidate =>
-    `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    candidate.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    candidate.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    candidate.location.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+    `${candidate.firstName || ''} ${candidate.lastName || ''}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (candidate.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (candidate.skills || []).some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase())) || []);
 
   const getExperienceLevel = (years) => {
-    if (years === 0) return 'Entry Level';
+    if (!years || years === 0) return 'Entry Level';
     if (years <= 2) return 'Junior';
     if (years <= 5) return 'Mid-Level';
-
     if (years <= 8) return 'Senior';
     return 'Expert';
+  };
+
+  const handleShortlistCandidate = (candidate) => {
+    if (!jobs || jobs.length === 0) {
+      Alert.alert('No Jobs Available', 'Please create a job posting first before shortlisting candidates');
+      return;
+    }
+    setSelectedCandidate(candidate);
+  };
+
+  const handleJobSelection = (job) => {
+    if (selectedCandidate && job) {
+      setShowJobSelection(false);
+      router.push({
+        pathname: '/interviews/schedule',
+        params: {
+          candidateId: selectedCandidate._id,
+          jobId: job._id,
+          candidateName: `${selectedCandidate.firstName} ${selectedCandidate.lastName}`,
+          jobTitle: job.title
+        }
+      });
+    }
+  };
+
+  const handleViewProfile = (candidate) => {
+    router.push({
+      pathname: '/hr/candidate-profile',
+      params: {
+        candidateId: candidate._id,
+        candidateName: `${candidate.firstName} ${candidate.lastName}`
+      }
+    });
   };
 
   if (!user) {
@@ -92,6 +110,17 @@ export default function CandidateListScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <Text>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (candidates === undefined) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Header title="Candidates" showBack={true} />
+        <View style={styles.loadingContainer}>
+          <Text>Loading candidates...</Text>
         </View>
       </SafeAreaView>
     );
@@ -135,7 +164,7 @@ export default function CandidateListScreen() {
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>
-              {candidates?.filter(c => c.experience >= 3).length || 0}
+              {candidates?.filter(c => (c.experience || 0) >= 3).length || 0}
             </Text>
             <Text style={styles.statLabel}>Experienced</Text>
           </View>
@@ -155,19 +184,104 @@ export default function CandidateListScreen() {
         </View>
 
         {/* Candidates List */}
-        {candidatesWithApplications.length > 0 ? (
-          candidatesWithApplications.map((candidate, idx) => (
-            <View key={idx} style={styles.candidateCard}>
-              <Text style={styles.candidateName}>{candidate.firstName} {candidate.lastName}</Text>
-              <Text style={styles.candidateEmail}>{candidate.email}</Text>
-              <Text style={styles.jobTitle}>Applied for: {candidate.jobTitle}</Text>
-              <Text style={styles.applicationDate}>Applied on: {new Date(candidate.appliedAt).toLocaleDateString()}</Text>
-              {candidate.resumeUrl && (
-                <TouchableOpacity onPress={() => {/* open resume */}}>
-                  <Text style={styles.resumeLink}>View Resume</Text>
-                </TouchableOpacity>
+        {filteredCandidates.length > 0 ? (
+          filteredCandidates.map((candidate) => (
+            <View key={candidate._id} style={styles.candidateCard}>
+              <View style={styles.candidateHeader}>
+                <View style={styles.candidateAvatar}>
+                  <Text style={styles.candidateInitials}>
+                    {candidate.firstName?.[0]}{candidate.lastName?.[0]}
+                  </Text>
+                </View>
+                <View style={styles.candidateInfo}>
+                  <Text style={styles.candidateName}>
+                    {candidate.firstName} {candidate.lastName}
+                  </Text>
+                  <Text style={styles.candidateEmail}>{candidate.email}</Text>
+                  <View style={styles.candidateMeta}>
+                    <View style={styles.metaItem}>
+                      <Ionicons name="location-outline" size={12} color="#6B7280" />
+                      <Text style={styles.metaText}>{candidate.location || 'Not specified'}</Text>
+                    </View>
+                    <View style={styles.metaItem}>
+                      <Ionicons name="briefcase-outline" size={12} color="#6B7280" />
+                      <Text style={styles.metaText}>{getExperienceLevel(candidate.experience || 0)}</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.candidateActions}>
+                  {candidate.resumeId && (
+                    <TouchableOpacity style={styles.resumeButton}>
+                      <Ionicons name="document-text" size={18} color="#3B82F6" />
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity style={styles.contactButton}>
+                    <Ionicons name="mail" size={18} color="#10B981" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {candidate.education && (
+                <View style={styles.educationSection}>
+                  <Ionicons name="school-outline" size={14} color="#6B7280" />
+                  <Text style={styles.educationText}>{candidate.education}</Text>
+                </View>
               )}
-              <Text numberOfLines={2}>{candidate.coverLetter}</Text>
+
+              {candidate.summary && (
+                <Text style={styles.candidateSummary} numberOfLines={2}>
+                  {candidate.summary}
+                </Text>
+              )}
+
+              {candidate.skills && Array.isArray(candidate.skills) && candidate.skills.length > 0 && (
+                <View style={styles.skillsSection}>
+                  <Text style={styles.skillsTitle}>Skills</Text>
+                  <View style={styles.skillsContainer}>
+                    {candidate.skills.slice(0, 4).map((skill, index) => (
+                      <View key={index} style={styles.skillTag}>
+                        <Text style={styles.skillText}>{skill}</Text>
+                      </View>
+                    ))}
+                    {candidate.skills.length > 4 && (
+                      <View style={styles.moreSkillsTag}>
+                        <Text style={styles.moreSkillsText}>+{candidate.skills.length - 4}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              )}
+
+              <View style={styles.candidateFooter}>
+                <View style={styles.socialLinks}>
+                  {candidate.linkedinUrl && (
+                    <TouchableOpacity style={styles.socialButton}>
+                      <Ionicons name="logo-linkedin" size={16} color="#0077B5" />
+                    </TouchableOpacity>
+                  )}
+                  {candidate.githubUrl && (
+                    <TouchableOpacity style={styles.socialButton}>
+                      <Ionicons name="logo-github" size={16} color="#333" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity 
+                    style={styles.shortlistButton}
+                    onPress={() => handleShortlistCandidate(candidate)}
+                  >
+                    <Ionicons name="checkmark-circle" size={16} color="#FFFFFF" />
+                    <Text style={styles.shortlistButtonText}>Shortlist</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.viewProfileButton}
+                    onPress={() => handleViewProfile(candidate)}
+                  >
+                    <Text style={styles.viewProfileText}>View Profile</Text>
+                    <Ionicons name="chevron-forward" size={14} color="#3B82F6" />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           ))
         ) : (
@@ -178,8 +292,7 @@ export default function CandidateListScreen() {
             </Text>
             <Text style={styles.emptyStateText}>
               {searchQuery 
-       
-         ? `No candidates match "${searchQuery}". Try different keywords.`
+                ? `No candidates match "${searchQuery}". Try different keywords.`
                 : 'Candidates will appear here once they register on the platform.'
               }
             </Text>
@@ -194,9 +307,48 @@ export default function CandidateListScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Job Selection Modal */}
+      <Modal
+        visible={showJobSelection}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowJobSelection(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select a Job</Text>
+            <Text style={styles.modalSubtitle}>
+              Choose the job you want to shortlist {selectedCandidate?.firstName} {selectedCandidate?.lastName} for
+            </Text>
+            
+            <ScrollView style={styles.jobsList}>
+              {jobs?.map(job => (
+                <TouchableOpacity 
+                  key={job._id} 
+                  style={styles.jobItem}
+                  onPress={() => handleJobSelection(job)}
+                >
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                  <Text style={styles.applicationDate}>{job.department} • {job.type}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.cancelModalButton}
+              onPress={() => setShowJobSelection(false)}
+            >
+              <Text style={styles.cancelModalButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
+
+// ... (keep all your existing styles the same)
 
 const styles = StyleSheet.create({
   container: {
@@ -407,6 +559,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  shortlistButton: {
+    backgroundColor: '#10B981',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  shortlistButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
   socialLinks: {
     flexDirection: 'row',
     gap: 8,
@@ -467,6 +637,61 @@ const styles = StyleSheet.create({
   },
   clearSearchButtonText: {
     color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    margin: 20,
+    borderRadius: 16,
+    padding: 20,
+    maxHeight: '80%',
+    width: '90%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  jobsList: {
+    maxHeight: 300,
+  },
+  jobItem: {
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  cancelModalButton: {
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  cancelModalButtonText: {
+    color: '#374151',
+    fontSize: 16,
     fontWeight: '600',
   },
   jobTitle: {

@@ -75,7 +75,7 @@ export default function CreateRequisitionScreen() {
         const parsedUser = JSON.parse(userData);
         if (parsedUser.role !== 'admin') {
           Alert.alert('Access Denied', 'Only admins can create requisitions');
-          router.back();
+          router.replace('/dashboard/hr');
           return;
         }
         setUser(parsedUser);
@@ -166,7 +166,7 @@ export default function CreateRequisitionScreen() {
       });
 
       Alert.alert('Success', 'Requisition created successfully! HR will be notified.', [
-        { text: 'OK', onPress: () => router.back() },
+        { text: 'OK', onPress: () => router.replace('/dashboard/hr') },
       ]);
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to create requisition');
@@ -188,7 +188,7 @@ export default function CreateRequisitionScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'android' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <Header title="Create Requisition" showBack={true} />

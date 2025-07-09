@@ -11,12 +11,12 @@ interface HeaderProps {
   rightComponent?: React.ReactNode;
 }
 
-export default function Header({ 
-  title, 
-  showBack = false, 
-  showMenu = false, 
+export default function Header({
+  title,
+  showBack = false,
+  showMenu = false,
   onMenuPress,
-  rightComponent 
+  rightComponent,
 }: HeaderProps) {
   return (
     <View style={styles.header}>
@@ -32,9 +32,9 @@ export default function Header({
           </TouchableOpacity>
         )}
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
-      
+
       <View style={styles.rightSection}>
         {rightComponent || <View style={styles.placeholder} />}
       </View>
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   title: {
-
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1F2937',

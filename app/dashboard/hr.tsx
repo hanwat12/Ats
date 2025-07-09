@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
-  Image,
 } from 'react-native';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -18,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import NotificationBell from '@/components/NotificationBell';
+import InterviewConfirmation from '../interviews/confirmation';
 
 interface User {
   userId: string;
@@ -27,14 +27,13 @@ interface User {
   email: string;
 }
 
-export default function AdminDashboard() {
+export default function HRDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const stats = useQuery(api.applications.getDashboardStats);
   const jobs = useQuery(api.jobs.getAllJobs);
-  const candidates = useQuery(api.candidate.getAllCandidates);
   const recentApplications = useQuery(api.applications.getAllApplicationsForHR);
 
   useEffect(() => {
@@ -46,7 +45,7 @@ export default function AdminDashboard() {
       const userData = await AsyncStorage.getItem('user');
       if (userData) {
         const parsedUser = JSON.parse(userData);
-        if (parsedUser.role !== 'admin') {
+        if (parsedUser.role !== 'hr' && parsedUser.role !== 'admin') {
           Alert.alert('Access Denied', 'You do not have permission to access this dashboard');
           router.back();
           return;
@@ -129,7 +128,7 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        title="Admin Dashboard"
+        title="HR Dashboard"
         showMenu={true}
         onMenuPress={() => setSidebarVisible(true)}
         rightComponent={
@@ -150,8 +149,7 @@ export default function AdminDashboard() {
           <Text style={styles.userName}>
             {user.firstName} {user.lastName}
           </Text>
-
-          <Text style={styles.userRole}>ADMIN DASHBOARD</Text>
+          <Text style={styles.userRole}>HR DASHBOARD</Text>
         </View>
 
         {/* Stats Cards */}
@@ -162,14 +160,6 @@ export default function AdminDashboard() {
             </View>
             <Text style={styles.statNumber}>{stats?.totalJobs || 0}</Text>
             <Text style={styles.statLabel}>Total Jobs</Text>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={styles.statIconContainer}>
-              <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-            </View>
-            <Text style={styles.statNumber}>{stats?.activeJobs || 0}</Text>
-            <Text style={styles.statLabel}>Active Jobs</Text>
           </View>
 
           <View style={styles.statCard}>
@@ -187,49 +177,33 @@ export default function AdminDashboard() {
             <Text style={styles.statNumber}>{stats?.selectedCandidates || 0}</Text>
             <Text style={styles.statLabel}>Selected</Text>
           </View>
+
+          <View style={styles.statCard}>
+            <View style={styles.statIconContainer}>
+              <Ionicons name="time" size={24} color="#10B981" />
+            </View>
+            <Text style={styles.statNumber}>{stats?.pendingApplications || 0}</Text>
+            <Text style={styles.statLabel}>Pending Review</Text>
+          </View>
         </View>
 
-        {/* Pending Applications Alert */}
-        {/* {stats?.pendingApplications && stats.pendingApplications > 0 && (
-          <View style={styles.alertCard}>
-            <View style={styles.alertIcon}>
-              <Ionicons name="alert-circle" size={24} color="#F59E0B" />
-            </View>
-            <View style={styles.alertContent}>
-              <Text style={styles.alertTitle}>
-                {stats.pendingApplications} New Application{stats.pendingApplications > 1 ? 's' : ''}
-              </Text>
-              <Text style={styles.alertText}>
-                Review and update application status
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles.alertButton}
-              onPress={() => router.push('/applications/manage' as any)}
-            >
-              <Text style={styles.alertButtonText}>Review</Text>
-            </TouchableOpacity>
-          </View>
-        )} */}
-
-        {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.actionsGrid}>
             <TouchableOpacity
               style={styles.actionCard}
-              onPress={() => router.push('/jobs/create' as any)}
+              onPress={() => router.push('/applications/manage' as any)}
             >
-              <Ionicons name="add-circle" size={32} color="#3B82F6" />
-              <Text style={styles.actionText}>Post New Job</Text>
+              <Ionicons name="document-text-outline" size={32} color="#3B82F6" />
+              <Text style={styles.actionText}>Manage Applications</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionCard}
-              onPress={() => router.push('/jobs/list' as any)}
+              onPress={() => router.push('/requisitions/upload-resume' as any)}
             >
-              <Ionicons name="list" size={32} color="#10B981" />
-              <Text style={styles.actionText}>Manage Jobs</Text>
+              <Ionicons name="cloud-upload-outline" size={32} color="#10B981" />
+              <Text style={styles.actionText}>Upload Resumes</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -242,63 +216,48 @@ export default function AdminDashboard() {
 
             <TouchableOpacity
               style={styles.actionCard}
-              onPress={() => router.push('/applications/manage' as any)}
+              onPress={() => router.push('/jobs/list' as any)}
             >
-              <Ionicons name="document-text-outline" size={32} color="#8B5CF6" />
-              <Text style={styles.actionText}>Applications</Text>
+              <Ionicons name="briefcase-outline" size={32} color="#8B5CF6" />
+              <Text style={styles.actionText}>View Jobs</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionCard}
-              onPress={() => router.push('/requisitions/create' as any)}
+              onPress={() => router.push('/interviews/confirmation' as any)}
             >
-              <Ionicons name="clipboard-outline" size={32} color="#EF4444" />
-              <Text style={styles.actionText}>New Requisition</Text>
+              <Ionicons name="briefcase-outline" size={32} color="#8B5CF6" />
+              <Text style={styles.actionText}>Interview Confirmation</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => router.push('/requisitions/list' as any)}
-            >
-              <Ionicons name="list-outline" size={32} color="#06B6D4" />
-              <Text style={styles.actionText}>Manage Requisitions</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Recent Jobs */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Jobs</Text>
-            <TouchableOpacity onPress={() => router.push('/jobs/list' as any)}>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-
-          {jobs?.slice(0, 3).map((job) => (
-            <TouchableOpacity
-              key={job._id}
-              style={styles.jobCard}
-              onPress={() => router.push(`/jobs/${job._id}` as any)}
-            >
-              <View style={styles.jobHeader}>
-                <Text style={styles.jobTitle}>{job.title}</Text>
-                <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: job.status === 'active' ? '#10B981' : '#6B7280' },
-                  ]}
+            {user.role === 'admin' && (
+              <>
+                <TouchableOpacity
+                  style={styles.actionCard}
+                  onPress={() => router.push('/jobs/create' as any)}
                 >
-                  <Text style={styles.statusText}>{job.status}</Text>
-                </View>
-              </View>
-              <Text style={styles.jobDepartment}>{job.department}</Text>
-              <Text style={styles.jobLocation}>{job.location}</Text>
-              <Text style={styles.jobSalary}>
-                {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                  <Ionicons name="add-circle" size={32} color="#EF4444" />
+                  <Text style={styles.actionText}>Post New Job</Text>
+                </TouchableOpacity>
+
+                {/* <TouchableOpacity
+                  style={styles.actionCard}
+                  onPress={() => router.push('/requisitions/create' as any)}
+                >
+                  <Ionicons name="clipboard-outline" size={32} color="#06B6D4" />
+                  <Text style={styles.actionText}>New Requisition</Text>
+                </TouchableOpacity> */}
+
+                <TouchableOpacity
+                  style={styles.actionCard}
+                  onPress={() => router.push('/requisitions/list' as any)}
+                >
+                  <Ionicons name="list-outline" size={32} color="#84CC16" />
+                  <Text style={styles.actionText}>Manage Requisitions</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </View>
 
         {/* Recent Applications */}
@@ -310,7 +269,7 @@ export default function AdminDashboard() {
             </TouchableOpacity>
           </View>
 
-          {recentApplications?.slice(0, 3).map((application) => (
+          {recentApplications?.slice(0, 5).map((application) => (
             <TouchableOpacity
               key={application._id}
               style={styles.applicationCard}
@@ -350,39 +309,42 @@ export default function AdminDashboard() {
           ))}
         </View>
 
-        {/* Recent Candidates */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Candidates</Text>
-            <TouchableOpacity onPress={() => router.push('/candidates/list' as any)}>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-
-          {candidates?.slice(0, 3).map((candidate: any) => (
-            <View key={candidate._id} style={styles.candidateCard}>
-              <View style={styles.candidateInfo}>
-                <Text style={styles.candidateName}>
-                  {candidate.firstName} {candidate.lastName}
-                </Text>
-                <Text style={styles.candidateEmail}>{candidate.email}</Text>
-                <Text style={styles.candidateExperience}>
-                  {candidate.experience || 0} years experience
-                </Text>
-              </View>
-              <View style={styles.candidateSkills}>
-                {(candidate.skills || []).slice(0, 2).map((skill: string, index: number) => (
-                  <View key={index} style={styles.skillTag}>
-                    <Text style={styles.skillText}>{skill}</Text>
-                  </View>
-                ))}
-                {(candidate.skills || []).length > 2 && (
-                  <Text style={styles.moreSkills}>+{(candidate.skills || []).length - 2}</Text>
-                )}
-              </View>
+        {/* Recent Jobs - Only for Admin */}
+        {user.role === 'admin' && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Recent Jobs</Text>
+              <TouchableOpacity onPress={() => router.push('/jobs/list' as any)}>
+                <Text style={styles.seeAllText}>See All</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-        </View>
+
+            {jobs?.slice(0, 3).map((job) => (
+              <TouchableOpacity
+                key={job._id}
+                style={styles.jobCard}
+                onPress={() => router.push(`/jobs/${job._id}` as any)}
+              >
+                <View style={styles.jobHeader}>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: job.status === 'active' ? '#10B981' : '#6B7280' },
+                    ]}
+                  >
+                    <Text style={styles.statusText}>{job.status}</Text>
+                  </View>
+                </View>
+                <Text style={styles.jobDepartment}>{job.department}</Text>
+                <Text style={styles.jobLocation}>{job.location}</Text>
+                <Text style={styles.jobSalary}>
+                  {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
       <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} user={user} />
@@ -421,7 +383,7 @@ const styles = StyleSheet.create({
   },
   userRole: {
     fontSize: 12,
-    color: '#EF4444',
+    color: '#10B981',
     fontWeight: '600',
     marginTop: 4,
   },
@@ -463,43 +425,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
-  },
-  alertCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFBEB',
-    borderRadius: 12,
-    padding: 16,
-    margin: 16,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-  },
-  alertIcon: {
-    marginRight: 12,
-  },
-  alertContent: {
-    flex: 1,
-  },
-  alertTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#92400E',
-    marginBottom: 2,
-  },
-  alertText: {
-    fontSize: 14,
-    color: '#92400E',
-  },
-  alertButton: {
-    backgroundColor: '#F59E0B',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  alertButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 14,
   },
   section: {
     padding: 24,
@@ -544,57 +469,6 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginTop: 8,
     textAlign: 'center',
-  },
-  jobCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  jobHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  jobTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    color: '#FFFFFF',
-    fontWeight: '600',
-
-    textTransform: 'uppercase',
-  },
-  jobDepartment: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  jobLocation: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  jobSalary: {
-    fontSize: 16,
-    color: '#10B981',
-    fontWeight: '600',
   },
   applicationCard: {
     backgroundColor: '#FFFFFF',
@@ -664,7 +538,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
   },
-  candidateCard: {
+  jobCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
@@ -675,31 +549,43 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  candidateExperience: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  candidateSkills: {
+  jobHeader: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    alignItems: 'center',
-    marginTop: 12,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
-  skillTag: {
-    backgroundColor: '#EBF8FF',
+  jobTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    flex: 1,
+  },
+  statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
+    marginLeft: 8,
   },
-  skillText: {
+  statusText: {
     fontSize: 12,
-    color: '#3B82F6',
+    color: '#FFFFFF',
     fontWeight: '600',
+    textTransform: 'uppercase',
   },
-  moreSkills: {
-    fontSize: 12,
+  jobDepartment: {
+    fontSize: 14,
     color: '#6B7280',
+    marginBottom: 4,
+  },
+  jobLocation: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  jobSalary: {
+    fontSize: 16,
+    color: '#10B981',
     fontWeight: '600',
   },
 });

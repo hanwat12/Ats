@@ -15,15 +15,35 @@ export default defineSchema({
 
   candidates: defineTable({
     userId: v.id('users'),
-    skills: v.array(v.string()),
-    experience: v.number(),
-    education: v.string(),
-    location: v.string(),
+    skills: v.optional(v.array(v.string())),
+    experience: v.optional(v.number()),
+    education: v.optional(v.string()),
+    location: v.optional(v.string()),
     resumeId: v.optional(v.string()),
     summary: v.optional(v.string()),
     linkedinUrl: v.optional(v.string()),
     githubUrl: v.optional(v.string()),
-  }).index('by_user', ['userId']),
+    portfolioUrl: v.optional(v.string()),
+    currentJobTitle: v.optional(v.string()),
+    currentCompany: v.optional(v.string()),
+    expectedSalary: v.optional(v.number()),
+    noticePeriod: v.optional(v.number()), // in days
+    availability: v.optional(v.string()), // 'immediately', 'within_month', 'negotiable'
+    workPreference: v.optional(v.string()), // 'remote', 'onsite', 'hybrid'
+    isProfileComplete: v.optional(v.boolean()),
+    profileCompletionPercentage: v.optional(v.number()),
+    lastUpdated: v.optional(v.number()),
+    isActivelyLooking: v.optional(v.boolean()),
+    preferredLocations: v.optional(v.array(v.string())),
+    certifications: v.optional(v.array(v.string())),
+    languages: v.optional(v.array(v.string())),
+    projectsCount: v.optional(v.number()),
+    achievementsCount: v.optional(v.number()),
+  })
+    .index('by_user', ['userId'])
+    .index('by_location', ['location'])
+    .index('by_experience', ['experience'])
+    .index('by_active_status', ['isActivelyLooking']),
 
   jobs: defineTable({
     title: v.string(),
@@ -178,4 +198,66 @@ export default defineSchema({
     .index('by_candidate', ['candidateId'])
     .index('by_job', ['jobId'])
     .index('by_recommendation', ['recommendation']),
+
+  candidate_projects: defineTable({
+    candidateId: v.id('users'),
+    title: v.string(),
+    description: v.string(),
+    technologies: v.array(v.string()),
+    projectUrl: v.optional(v.string()),
+    githubUrl: v.optional(v.string()),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    isOngoing: v.optional(v.boolean()),
+    teamSize: v.optional(v.number()),
+    role: v.optional(v.string()),
+    achievements: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+  }).index('by_candidate', ['candidateId']),
+
+  candidate_achievements: defineTable({
+    candidateId: v.id('users'),
+    title: v.string(),
+    description: v.string(),
+    achievementType: v.string(),
+    issuedBy: v.optional(v.string()),
+    issuedDate: v.optional(v.string()),
+    credentialId: v.optional(v.string()),
+    credentialUrl: v.optional(v.string()),
+    expiryDate: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index('by_candidate', ['candidateId'])
+    .index('by_type', ['achievementType']),
+
+  candidate_education: defineTable({
+    candidateId: v.id('users'),
+    degree: v.string(),
+    fieldOfStudy: v.string(),
+    institution: v.string(),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    isOngoing: v.optional(v.boolean()),
+    grade: v.optional(v.string()),
+    activities: v.optional(v.string()),
+    description: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index('by_candidate', ['candidateId']),
+
+  candidate_work_experience: defineTable({
+    candidateId: v.id('users'),
+    jobTitle: v.string(),
+    company: v.string(),
+    location: v.optional(v.string()),
+    startDate: v.string(),
+    endDate: v.optional(v.string()),
+    isCurrentJob: v.optional(v.boolean()),
+    description: v.string(),
+    responsibilities: v.optional(v.array(v.string())),
+    achievements: v.optional(v.array(v.string())),
+    technologies: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+  })
+    .index('by_candidate', ['candidateId'])
+    .index('by_company', ['company']),
 });

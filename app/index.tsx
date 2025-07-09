@@ -26,13 +26,21 @@ export default function Index() {
       const userData = await AsyncStorage.getItem('user');
       if (userData) {
         const user = JSON.parse(userData);
-        if (user.role === 'admin' ) {
-          router.replace('/dashboard/admin');
-        } 
+        // Add small delay to ensure navigation works properly
+        setTimeout(() => {
+          if (user.role === 'admin') {
+            router.replace('/dashboard/admin');
+          } else if (user.role === 'hr') {
+            router.replace('/dashboard/hr');
+          } else {
+            router.replace('/'); // Default fallback
+          }
+        }, 100);
+      } else {
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error checking auth status:', error);
-    } finally {
       setLoading(false);
     }
   };
@@ -76,17 +84,11 @@ export default function Index() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => router.push('/auth/login')}
-          >
+          <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/auth/login')}>
             <Text style={styles.loginButtonText}>Sign In</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.signupButton}
-            onPress={() => router.push('/auth/signup')}
-          >
+          <TouchableOpacity style={styles.signupButton} onPress={() => router.push('/auth/signup')}>
             <Text style={styles.signupButtonText}>Create Account</Text>
           </TouchableOpacity>
         </View>

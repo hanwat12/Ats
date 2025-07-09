@@ -185,7 +185,6 @@ export default function HRRequisitionsListScreen() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
