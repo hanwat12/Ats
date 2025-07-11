@@ -96,8 +96,9 @@ export default function UploadResumeScreen() {
       if (!result.canceled && result.assets[0]) {
         const file = result.assets[0];
 
-        if (file.size && file.size > 5 * 1024 * 1024) {
-          Alert.alert('File Too Large', 'Please select a file smaller than 5MB');
+        // Check file size (limit to 10MB)
+        if (file.size && file.size > 10 * 1024 * 1024) {
+          Alert.alert('File Too Large', 'Please select a file smaller than 10MB');
           return;
         }
 
@@ -105,54 +106,46 @@ export default function UploadResumeScreen() {
       }
     } catch (error) {
       console.error('Error picking document:', error);
-      Alert.alert('Error', 'Failed to pick document');
+      Alert.alert('Error', 'Failed to select document');
     }
   };
 
-  const handleUploadCandidate = async () => {
-    const { candidateName, candidateEmail, candidatePhone, skills, experience, notes } = formData;
-
-    if (!candidateName || !skills || !experience || !selectedFile) {
-      Alert.alert('Error', 'Please fill in all required fields and select a resume file');
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      Alert.alert('Error', 'Please select a file first');
       return;
     }
 
-    if (parseInt(experience) < 0) {
-      Alert.alert('Error', 'Please enter a valid experience value');
-      return;
-    }
-
-    if (!user || !requisitionId) {
-      Alert.alert('Error', 'Missing required information');
+    if (!formData.candidateName || !formData.candidateEmail) {
+      Alert.alert('Error', 'Please fill in candidate name and email');
       return;
     }
 
     setLoading(true);
     try {
-      const skillsArray = skills
-        .split(',')
-        .map((skill) => skill.trim())
-        .filter((skill) => skill.length > 0);
-
-      // In a real implementation, you would upload the file to Object Storage
-      // For now, we'll just store the file name as URL
-      const resumeUrl = selectedFile.name;
-
       await uploadCandidate({
         requisitionId: requisitionId as Id<'requisitions'>,
-        candidateName,
-        candidateEmail: candidateEmail || undefined,
-        candidatePhone: candidatePhone || undefined,
-        skills: skillsArray,
-        experience: parseInt(experience),
-        resumeUrl,
-        uploadedBy: user.userId as Id<'users'>,
-        notes: notes || undefined,
+        candidateName: formData.candidateName,
+        candidateEmail: formData.candidateEmail,
+        candidatePhone: formData.candidatePhone,
+        skills: formData.skills
+          .split(',')
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        experience: parseInt(formData.experience) || 0,
+        resumeFileName: selectedFile.name,
+        resumeFileSize: selectedFile.size || 0,
+        resumeFileUrl: selectedFile.uri,
+        notes: formData.notes,
+        uploadedBy: user!.userId as Id<'users'>,
+        uploadedAt: Date.now(),
       });
 
-      Alert.alert('Success', 'Candidate resume uploaded successfully!', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+      Alert.alert(
+        'Success',
+        'Candidate resume uploaded successfully! The requisition owner has been notified.',
+        [{ text: 'OK', onPress: () => router.back() }]
+      );
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to upload resume');
     } finally {
@@ -271,6 +264,17 @@ export default function UploadResumeScreen() {
                       <Ionicons name="close" size={20} color="#EF4444" />
                     </TouchableOpacity>
                   </View>
+                  {/* Submit Button for selected file */}
+                  <TouchableOpacity
+                    style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+                    onPress={handleUpload}
+                    disabled={loading}
+                  >
+                    <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
+                    <Text style={styles.submitButtonText}>
+                      {loading ? 'Uploading...' : 'Submit Resume'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <TouchableOpacity style={styles.uploadArea} onPress={pickDocument}>
@@ -297,7 +301,7 @@ export default function UploadResumeScreen() {
 
             <TouchableOpacity
               style={[styles.uploadButton, loading && styles.uploadButtonDisabled]}
-              onPress={handleUploadCandidate}
+              onPress={handleUpload}
               disabled={loading}
             >
               <Text style={styles.uploadButtonText}>
@@ -461,7 +465,25 @@ const styles = StyleSheet.create({
   },
   uploadButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  submitButton: {
+    backgroundColor: '#10B981',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
+    marginLeft: 8,
   },
 });

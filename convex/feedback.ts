@@ -6,6 +6,7 @@ export const submitFeedback = mutation({
     interviewId: v.id('interviews'),
     candidateId: v.id('candidates'),
     jobId: v.id('jobs'),
+    interviewerId: v.id('users'),
     interviewerName: v.string(),
     overallRating: v.number(),
     technicalSkills: v.number(),
@@ -58,7 +59,44 @@ export const getFeedbackByJob = query({
 
 export const getAllFeedback = query({
   handler: async (ctx) => {
-    return await ctx.db.query('feedback').collect();
+    const feedback = await ctx.db.query('feedback').collect();
+
+    const feedbackWithDetails = await Promise.all(
+      feedback.map(async (fb) => {
+        const interview = await ctx.db.get(fb.interviewId);
+        const candidate = await ctx.db.get(fb.candidateId);
+        const job = await ctx.db.get(fb.jobId);
+
+        // Get user details from candidate
+        let user = null;
+        if (candidate) {
+          user = await ctx.db.get(candidate.userId);
+        }
+
+        let application = null;
+        if (interview) {
+          application = await ctx.db.get(interview.applicationId);
+        }
+
+        return {
+          ...fb,
+          interview,
+          candidate:
+            candidate && user
+              ? {
+                  ...candidate,
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  email: user.email,
+                }
+              : null,
+          job,
+          application,
+        };
+      })
+    );
+
+    return feedbackWithDetails;
   },
 });
 

@@ -22,7 +22,10 @@ export const updateCandidateProfile = mutation({
     preferredLocations: v.optional(v.array(v.string())),
     certifications: v.optional(v.array(v.string())),
     languages: v.optional(v.array(v.string())),
+    preferredSalaryMin: v.optional(v.number()),
+    preferredSalaryMax: v.optional(v.number()),
   },
+
   handler: async (ctx, args) => {
     const { userId, ...updates } = args;
 
@@ -72,6 +75,10 @@ export const getCandidateProfile = query({
 export const createCandidateProfile = mutation({
   args: {
     userId: v.id('users'),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    email: v.optional(v.string()),
+    phone: v.optional(v.string()),
     skills: v.optional(v.array(v.string())),
     experience: v.optional(v.number()),
     education: v.optional(v.string()),
@@ -80,24 +87,31 @@ export const createCandidateProfile = mutation({
     linkedinUrl: v.optional(v.string()),
     githubUrl: v.optional(v.string()),
     portfolioUrl: v.optional(v.string()),
-    currentJobTitle: v.optional(v.string()),
-    currentCompany: v.optional(v.string()),
-    expectedSalary: v.optional(v.number()),
-    noticePeriod: v.optional(v.number()),
-    availability: v.optional(v.string()),
     workPreference: v.optional(v.string()),
     isActivelyLooking: v.optional(v.boolean()),
-    preferredLocations: v.optional(v.array(v.string())),
-    certifications: v.optional(v.array(v.string())),
-    languages: v.optional(v.array(v.string())),
+    preferredSalaryMin: v.optional(v.number()),
+    preferredSalaryMax: v.optional(v.number()),
+    availability: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { userId, ...profileData } = args;
+    // If user info is provided, update the user record
+    if (args.firstName || args.lastName || args.email || args.phone) {
+      const updateData: any = {};
+      if (args.firstName) updateData.firstName = args.firstName;
+      if (args.lastName) updateData.lastName = args.lastName;
+      if (args.email) updateData.email = args.email;
+      if (args.phone) updateData.phone = args.phone;
 
-    // Check if profile already exists
+      await ctx.db.patch(args.userId, updateData);
+    }
+
+    // Convert string userId to proper ID format
+    const userIdAsId = args.userId as any;
+
+    // Check if candidate profile already exists
     const existingProfile = await ctx.db
       .query('candidates')
-      .withIndex('by_user', (q) => q.eq('userId', userId))
+      .withIndex('by_user', (q) => q.eq('userId', userIdAsId))
       .unique();
 
     if (existingProfile) {
@@ -106,25 +120,20 @@ export const createCandidateProfile = mutation({
 
     // Create new profile with defaults
     const newProfile = await ctx.db.insert('candidates', {
-      userId,
-      skills: profileData.skills || [],
-      experience: profileData.experience || 0,
-      education: profileData.education || '',
-      location: profileData.location || '',
-      summary: profileData.summary || '',
-      linkedinUrl: profileData.linkedinUrl || '',
-      githubUrl: profileData.githubUrl || '',
-      portfolioUrl: profileData.portfolioUrl || '',
-      currentJobTitle: profileData.currentJobTitle || '',
-      currentCompany: profileData.currentCompany || '',
-      expectedSalary: profileData.expectedSalary || 0,
-      noticePeriod: profileData.noticePeriod || 30,
-      availability: profileData.availability || 'negotiable',
-      workPreference: profileData.workPreference || 'hybrid',
-      isActivelyLooking: profileData.isActivelyLooking || true,
-      preferredLocations: profileData.preferredLocations || [],
-      certifications: profileData.certifications || [],
-      languages: profileData.languages || [],
+      userId: userIdAsId,
+      skills: args.skills || [],
+      experience: args.experience || 0,
+      education: args.education || '',
+      location: args.location || '',
+      summary: args.summary || '',
+      linkedinUrl: args.linkedinUrl || '',
+      githubUrl: args.githubUrl || '',
+      portfolioUrl: args.portfolioUrl || '',
+      workPreference: args.workPreference || 'hybrid',
+      isActivelyLooking: args.isActivelyLooking || true,
+      preferredSalaryMin: args.preferredSalaryMin || 0,
+      preferredSalaryMax: args.preferredSalaryMax || 0,
+      availability: args.availability || 'negotiable',
       isProfileComplete: false,
       profileCompletionPercentage: 0,
       lastUpdated: Date.now(),
@@ -137,40 +146,60 @@ export const createCandidateProfile = mutation({
 });
 
 export const getAllCandidates = query({
-  args: {},
   handler: async (ctx) => {
-    try {
-      const candidates = await ctx.db.query('candidates').collect();
+    const candidates = await ctx.db.query('candidates').collect();
 
-      // Get user details for each candidate
-      const candidatesWithUsers = await Promise.all(
-        candidates.map(async (candidate) => {
-          const user = await ctx.db.get(candidate.userId);
-          return {
-            _id: candidate._id,
-            _creationTime: candidate._creationTime,
-            userId: candidate.userId,
-            firstName: user?.firstName || '',
-            lastName: user?.lastName || '',
-            email: user?.email || '',
-            phone: user?.phone || '',
-            skills: candidate.skills || [],
-            experience: candidate.experience || 0,
-            location: candidate.location || '',
-            education: candidate.education || '',
-            summary: candidate.summary || '',
-            linkedinUrl: candidate.linkedinUrl || '',
-            githubUrl: candidate.githubUrl || '',
-            resumeId: candidate.resumeId || null,
-          };
-        })
-      );
+    const candidatesWithUserInfo = await Promise.all(
+      candidates.map(async (candidate) => {
+        const user = await ctx.db.get(candidate.userId);
+        return {
+          ...candidate,
+          firstName: user?.firstName || '',
+          lastName: user?.lastName || '',
+          email: user?.email || '',
+        };
+      })
+    );
 
-      return candidatesWithUsers;
-    } catch (error) {
-      console.error('Error fetching candidates:', error);
-      return [];
-    }
+    return candidatesWithUserInfo;
+  },
+});
+
+export const getPendingInterviewsForHR = query({
+  handler: async (ctx) => {
+    const interviews = await ctx.db
+      .query('interviews')
+      .withIndex('by_status', (q) => q.eq('status', 'scheduled'))
+      .collect();
+
+    const interviewsWithDetails = await Promise.all(
+      interviews.map(async (interview) => {
+        const application = await ctx.db.get(interview.applicationId);
+        if (!application) return null;
+
+        const candidate = await ctx.db.get(application.candidateId);
+        const job = await ctx.db.get(application.jobId);
+
+        return {
+          ...interview,
+          candidate: candidate
+            ? {
+                firstName: candidate.firstName || '',
+                lastName: candidate.lastName || '',
+                email: candidate.email || '',
+              }
+            : null,
+          job: job
+            ? {
+                title: job.title,
+                department: job.department,
+              }
+            : null,
+        };
+      })
+    );
+
+    return interviewsWithDetails.filter((interview) => interview !== null);
   },
 });
 
@@ -533,39 +562,6 @@ export const scheduleInterviewForCandidate = mutation({
     });
 
     return interviewId;
-  },
-});
-
-export const getPendingInterviewsForHR = query({
-  handler: async (ctx) => {
-    const interviews = await ctx.db
-      .query('interviews')
-      .withIndex('by_status', (q) => q.eq('status', 'scheduled'))
-      .collect();
-
-    const interviewsWithDetails = await Promise.all(
-      interviews.map(async (interview) => {
-        const application = await ctx.db.get(interview.applicationId);
-        if (!application) return null;
-
-        const job = await ctx.db.get(application.jobId);
-        const candidate = await ctx.db.get(application.candidateId);
-        const candidateProfile = await ctx.db
-          .query('candidates')
-          .withIndex('by_user', (q) => q.eq('userId', application.candidateId))
-          .unique();
-
-        return {
-          ...interview,
-          application,
-          job,
-          candidate,
-          candidateProfile,
-        };
-      })
-    );
-
-    return interviewsWithDetails.filter(Boolean);
   },
 });
 

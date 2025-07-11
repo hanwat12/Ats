@@ -39,6 +39,8 @@ export default defineSchema({
     languages: v.optional(v.array(v.string())),
     projectsCount: v.optional(v.number()),
     achievementsCount: v.optional(v.number()),
+    preferredSalaryMin: v.optional(v.number()),
+    preferredSalaryMax: v.optional(v.number()),
   })
     .index('by_user', ['userId'])
     .index('by_location', ['location'])
@@ -70,6 +72,7 @@ export default defineSchema({
     status: v.union(
       v.literal('applied'),
       v.literal('screening'),
+      v.literal('shortlisted'),
       v.literal('interview_scheduled'),
       v.literal('interviewed'),
       v.literal('selected'),
@@ -112,7 +115,9 @@ export default defineSchema({
       v.literal('application_status'),
       v.literal('interview_scheduled'),
       v.literal('job_posted'),
-      v.literal('general')
+      v.literal('general'),
+      v.literal('resume_upload'),
+      v.literal('candidate_shortlisted')
     ),
     relatedId: v.optional(v.string()),
     isRead: v.boolean(),
@@ -141,6 +146,7 @@ export default defineSchema({
 
   requisition_candidates: defineTable({
     requisitionId: v.id('requisitions'),
+
     candidateName: v.string(),
     candidateEmail: v.optional(v.string()),
     candidatePhone: v.optional(v.string()),
@@ -260,4 +266,69 @@ export default defineSchema({
   })
     .index('by_candidate', ['candidateId'])
     .index('by_company', ['company']),
+
+  queries: defineTable({
+    fromUserId: v.id('users'),
+    toUserId: v.id('users'),
+    candidateId: v.optional(v.id('candidates')),
+    jobId: v.optional(v.id('jobs')),
+    interviewId: v.optional(v.id('interviews')),
+    subject: v.string(),
+    message: v.string(),
+    status: v.union(v.literal('open'), v.literal('in_progress'), v.literal('resolved')),
+    priority: v.union(
+      v.literal('low'),
+      v.literal('medium'),
+      v.literal('high'),
+      v.literal('urgent')
+    ),
+    category: v.union(
+      v.literal('candidate_selection'),
+      v.literal('interview_scheduling'),
+      v.literal('feedback_clarification'),
+      v.literal('general')
+    ),
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+  })
+    .index('by_from_user', ['fromUserId'])
+    .index('by_to_user', ['toUserId'])
+    .index('by_status', ['status'])
+    .index('by_category', ['category']),
+
+  query_responses: defineTable({
+    queryId: v.id('queries'),
+    responderId: v.id('users'),
+    message: v.string(),
+    isRead: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index('by_query', ['queryId'])
+    .index('by_responder', ['responderId']),
+
+  resume_uploads: defineTable({
+    candidateId: v.id('candidates'),
+    fileName: v.string(),
+    fileUrl: v.string(),
+    fileSize: v.number(),
+    uploadedBy: v.id('users'),
+    requisitionId: v.optional(v.id('requisitions')),
+
+    jobId: v.optional(v.id('jobs')),
+    status: v.union(
+      v.literal('uploaded'),
+      v.literal('reviewed'),
+      v.literal('shortlisted'),
+      v.literal('rejected')
+    ),
+    uploadedAt: v.number(),
+    reviewedAt: v.optional(v.number()),
+    reviewedBy: v.optional(v.id('users')),
+    notes: v.optional(v.string()),
+    reviewNotes: v.optional(v.string()),
+  })
+    .index('by_candidate', ['candidateId'])
+    .index('by_uploaded_by', ['uploadedBy'])
+    .index('by_status', ['status'])
+    .index('by_job', ['jobId']),
 });

@@ -19,10 +19,11 @@ import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
 import type * as materData from "../materData.js";
 import type * as notifications from "../notifications.js";
+import type * as queries from "../queries.js";
 import type * as quickFix from "../quickFix.js";
 import type * as quickSetup from "../quickSetup.js";
 import type * as requisitions from "../requisitions.js";
-import type * as resume from "../resume.js";
+import type * as resumeUpload from "../resumeUpload.js";
 import type * as seedData from "../seedData.js";
 
 import type {
@@ -51,10 +52,11 @@ declare const fullApi: ApiFromModules<{
   jobs: typeof jobs;
   materData: typeof materData;
   notifications: typeof notifications;
+  queries: typeof queries;
   quickFix: typeof quickFix;
   quickSetup: typeof quickSetup;
   requisitions: typeof requisitions;
-  resume: typeof resume;
+  resumeUpload: typeof resumeUpload;
   seedData: typeof seedData;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

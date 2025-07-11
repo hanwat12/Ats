@@ -125,83 +125,6 @@ export const getApplicationsByCandidate = query({
 
 // return applicationsWithJobs;
 
-export const updateApplicationStatus = mutation({
-  args: {
-    applicationId: v.id('applications'),
-    status: v.union(
-      v.literal('applied'),
-      v.literal('screening'),
-      v.literal('interview_scheduled'),
-      v.literal('interviewed'),
-      v.literal('selected'),
-      v.literal('rejected')
-    ),
-    reviewedBy: v.id('users'),
-    reviewNotes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const { applicationId, status, reviewedBy, reviewNotes } = args;
-
-    // Update application status
-    await ctx.db.patch(applicationId, {
-      status,
-      reviewedBy,
-      reviewedAt: Date.now(),
-      reviewNotes,
-    });
-
-    // Get application details for notification
-    const application = await ctx.db.get(applicationId);
-    if (application) {
-      const job = await ctx.db.get(application.jobId);
-      const reviewer = await ctx.db.get(reviewedBy);
-
-      if (job && reviewer) {
-        // Create notification for candidate
-        let notificationTitle = '';
-        let notificationMessage = '';
-
-        switch (status) {
-          case 'screening':
-            notificationTitle = 'Application Under Review';
-            notificationMessage = `Your application for ${job.title} is now under review.`;
-            break;
-          case 'interview_scheduled':
-            notificationTitle = 'Interview Scheduled';
-            notificationMessage = `Congratulations! An interview has been scheduled for ${job.title}.`;
-            break;
-          case 'interviewed':
-            notificationTitle = 'Interview Completed';
-            notificationMessage = `Thank you for interviewing for ${job.title}. We'll be in touch soon.`;
-            break;
-          case 'selected':
-            notificationTitle = "🎉 Congratulations! You're Selected";
-            notificationMessage = `Great news! You have been selected for the ${job.title} position. HR will contact you soon with next steps.`;
-            break;
-          case 'rejected':
-            notificationTitle = 'Application Update';
-            notificationMessage = `Thank you for your interest in ${job.title}. We've decided to move forward with other candidates.`;
-            break;
-        }
-
-        if (notificationTitle) {
-          await ctx.db.insert('notifications', {
-            userId: application.candidateId,
-            title: notificationTitle,
-            message: notificationMessage,
-            type: 'application_status',
-            relatedId: applicationId,
-            isRead: false,
-            createdAt: Date.now(),
-          });
-        }
-      }
-    }
-
-    return applicationId;
-  },
-});
-
 export const getAllApplicationsForHR = query({
   args: {},
   handler: async (ctx) => {
@@ -235,20 +158,24 @@ export const getAllApplicationsForHR = query({
 });
 
 export const getDashboardStats = query({
-  args: {},
   handler: async (ctx) => {
-    const totalJobs = await ctx.db.query('jobs').collect();
-    const activeJobs = totalJobs.filter((job) => job.status === 'active');
     const totalApplications = await ctx.db.query('applications').collect();
-    const selectedCandidates = totalApplications.filter((app) => app.status === 'selected');
+    const totalJobs = await ctx.db.query('jobs').collect();
+    const totalCandidates = await ctx.db.query('candidates').collect();
+
+    const activeJobs = totalJobs.filter((job) => job.status === 'active');
     const pendingApplications = totalApplications.filter((app) => app.status === 'applied');
+    const interviewsScheduled = totalApplications.filter(
+      (app) => app.status === 'interview_scheduled'
+    );
 
     return {
-      totalJobs: totalJobs.length,
-      activeJobs: activeJobs.length,
       totalApplications: totalApplications.length,
-      selectedCandidates: selectedCandidates.length,
+      totalJobs: totalJobs.length,
+      totalCandidates: totalCandidates.length,
+      activeJobs: activeJobs.length,
       pendingApplications: pendingApplications.length,
+      interviewsScheduled: interviewsScheduled.length,
     };
   },
 });
@@ -268,5 +195,41 @@ export const getAllApplications = query({
         };
       })
     );
+  },
+});
+
+export const getApplicationsByStatus = query({
+  args: { status: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('applications')
+      .withIndex('by_status', (q) => q.eq('status', args.status as any))
+      .collect();
+  },
+});
+
+export const updateApplicationStatus = mutation({
+  args: {
+    applicationId: v.id('applications'),
+    status: v.union(
+      v.literal('applied'),
+      v.literal('screening'),
+      v.literal('interview_scheduled'),
+      v.literal('interviewed'),
+      v.literal('selected'),
+      v.literal('rejected'),
+      v.literal('on-hold')
+    ),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { applicationId, status, notes } = args;
+
+    await ctx.db.patch(applicationId, {
+      reviewNotes: notes,
+      reviewedAt: Date.now(),
+    });
+
+    return { success: true };
   },
 });

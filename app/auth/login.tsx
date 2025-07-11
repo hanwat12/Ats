@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import {
   View,
@@ -35,15 +33,15 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       const result = await login({ email, password });
-      
+
       // Store user data locally
       await AsyncStorage.setItem('user', JSON.stringify(result));
-      
+
       // Navigate based on role
       if (result.role === 'admin' || result.role === 'hr') {
         router.replace('/dashboard/admin');
       } else {
-        router.replace('/');
+        router.replace('/dashboard/hr');
       }
     } catch (error) {
       Alert.alert('Login Failed', error instanceof Error ? error.message : 'An error occurred');
@@ -61,12 +59,12 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.content}>
             <View style={styles.logoContainer}>
-                      <Image
-                        source={require('../../assets/Slrd.png')}
-                        style={styles.logoImage}
-                        resizeMode="contain"
-                      />
-                    </View>
+              <Image
+                source={require('../../assets/Slrd.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+            </View>
             <Text style={styles.title}>Welcome Back</Text>
             <Text style={styles.subtitle}>Sign in to your account</Text>
           </View>
@@ -104,9 +102,7 @@ export default function LoginScreen() {
               onPress={handleLogin}
               disabled={loading}
             >
-              <Text style={styles.loginButtonText}>
-                {loading ? 'Signing In...' : 'Sign In'}
-              </Text>
+              <Text style={styles.loginButtonText}>{loading ? 'Signing In...' : 'Sign In'}</Text>
             </TouchableOpacity>
 
             <View style={styles.signupContainer}>
@@ -135,7 +131,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
-   content: {
+  content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

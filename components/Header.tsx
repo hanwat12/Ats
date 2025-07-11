@@ -9,6 +9,7 @@ interface HeaderProps {
   showMenu?: boolean;
   onMenuPress?: () => void;
   rightComponent?: React.ReactNode;
+  onBackPress?: () => void;
 }
 
 export default function Header({
