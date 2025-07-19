@@ -16,9 +16,6 @@ export default function RootLayout() {
         <Stack.Screen name="jobs/list" />
         <Stack.Screen name="candidates/upload" />
         <Stack.Screen name="candidates/list" />
-        <Stack.Screen name="queries/create" />
-        <Stack.Screen name="queries/[id]" />
-        <Stack.Screen name="notifications/index" />
         <Stack.Screen name="feedback/index" />
       </Stack>
     </ConvexProvider>

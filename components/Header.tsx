@@ -1,24 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 interface HeaderProps {
   title: string;
   showBack?: boolean;
-  showMenu?: boolean;
-  onMenuPress?: () => void;
-  rightComponent?: React.ReactNode;
-  onBackPress?: () => void;
+  rightElement?: React.ReactNode;
 }
 
-export default function Header({
-  title,
-  showBack = false,
-  showMenu = false,
-  onMenuPress,
-  rightComponent,
-}: HeaderProps) {
+export default function Header({ title, showBack = false, rightElement }: HeaderProps) {
   return (
     <View style={styles.header}>
       <View style={styles.leftSection}>
@@ -27,17 +18,10 @@ export default function Header({
             <Ionicons name="arrow-back" size={24} color="#1F2937" />
           </TouchableOpacity>
         )}
-        {showMenu && (
-          <TouchableOpacity onPress={onMenuPress} style={styles.iconButton}>
-            <Ionicons name="menu" size={24} color="#1F2937" />
-          </TouchableOpacity>
-        )}
       </View>
-
       <Text style={styles.title}>{title}</Text>
-
       <View style={styles.rightSection}>
-        {rightComponent || <View style={styles.placeholder} />}
+        {rightElement}
       </View>
     </View>
   );
@@ -76,8 +60,5 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     textAlign: 'center',
     flex: 1,
-  },
-  placeholder: {
-    width: 40,
   },
 });

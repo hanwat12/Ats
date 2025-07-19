@@ -147,10 +147,10 @@ export default function CandidateListScreen() {
                   Experience: {candidate.experience} years
                 </Text>
                 <Text style={styles.candidateDetails}>
-                  Job: {candidate.jobTitle}
+                  Job: {jobs?.find(j => j._id === candidate.jobId)?.title || 'Unknown Job'}
                 </Text>
                 <Text style={styles.candidateDetails}>
-                  Uploaded by: {candidate.uploaderName}
+                  Uploaded by: HR User
                 </Text>
               </View>
               <View style={[styles.statusBadge, { backgroundColor: getStatusColor(candidate.status) }]}>
