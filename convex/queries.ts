@@ -1,33 +1,18 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 
-// Create a new query
 export const createQuery = mutation({
   args: {
     fromUserId: v.id('users'),
     toUserId: v.id('users'),
-    candidateId: v.optional(v.id('candidates')),
     jobId: v.optional(v.id('jobs')),
-    interviewId: v.optional(v.id('interviews')),
+    candidateId: v.optional(v.id('candidates')),
     subject: v.string(),
     message: v.string(),
-    priority: v.union(
-      v.literal('low'),
-      v.literal('medium'),
-      v.literal('high'),
-      v.literal('urgent')
-    ),
-    category: v.union(
-      v.literal('candidate_selection'),
-      v.literal('interview_scheduling'),
-      v.literal('feedback_clarification'),
-      v.literal('general')
-    ),
   },
   handler: async (ctx, args) => {
     const queryId = await ctx.db.insert('queries', {
       ...args,
-      status: 'open',
       createdAt: Date.now(),
     });
 
@@ -35,8 +20,8 @@ export const createQuery = mutation({
     await ctx.db.insert('notifications', {
       userId: args.toUserId,
       title: 'New Query Received',
-      message: `You have a new ${args.priority} priority query: ${args.subject}`,
-      type: 'general',
+      message: `You have a new query: ${args.subject}`,
+      type: 'query_sent',
       relatedId: queryId,
       isRead: false,
       createdAt: Date.now(),
@@ -46,7 +31,6 @@ export const createQuery = mutation({
   },
 });
 
-// Respond to a query
 export const respondToQuery = mutation({
   args: {
     queryId: v.id('queries'),
@@ -58,14 +42,7 @@ export const respondToQuery = mutation({
       queryId: args.queryId,
       responderId: args.responderId,
       message: args.message,
-      isRead: false,
       createdAt: Date.now(),
-    });
-
-    // Update query status
-    await ctx.db.patch(args.queryId, {
-      status: 'in_progress',
-      updatedAt: Date.now(),
     });
 
     // Get original query to notify sender
@@ -75,7 +52,7 @@ export const respondToQuery = mutation({
         userId: query.fromUserId,
         title: 'Query Response Received',
         message: `Your query "${query.subject}" has been responded to`,
-        type: 'general',
+        type: 'query_responded',
         relatedId: args.queryId,
         isRead: false,
         createdAt: Date.now(),
@@ -86,18 +63,17 @@ export const respondToQuery = mutation({
   },
 });
 
-// Get queries for a user
 export const getQueriesForUser = query({
   args: { userId: v.id('users') },
   handler: async (ctx, args) => {
     const queriesFromUser = await ctx.db
       .query('queries')
-      .withIndex('by_from_user', (q) => q.eq('fromUserId', args.userId))
+      .filter((q) => q.eq(q.field('fromUserId'), args.userId))
       .collect();
 
     const queriesToUser = await ctx.db
       .query('queries')
-      .withIndex('by_to_user', (q) => q.eq('toUserId', args.userId))
+      .filter((q) => q.eq(q.field('toUserId'), args.userId))
       .collect();
 
     const allQueries = [...queriesFromUser, ...queriesToUser];
@@ -108,7 +84,7 @@ export const getQueriesForUser = query({
         const toUser = await ctx.db.get(query.toUserId);
         const responses = await ctx.db
           .query('query_responses')
-          .withIndex('by_query', (q) => q.eq('queryId', query._id))
+          .filter((q) => q.eq(q.field('queryId'), query._id))
           .collect();
 
         return {
@@ -125,32 +101,8 @@ export const getQueriesForUser = query({
   },
 });
 
-// Update query status
-export const updateQueryStatus = mutation({
-  args: {
-    queryId: v.id('queries'),
-    status: v.union(v.literal('open'), v.literal('in_progress'), v.literal('resolved')),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.queryId, {
-      status: args.status,
-      updatedAt: Date.now(),
-    });
-    return args.queryId;
-  },
-});
-
-// Mark response as read
-export const markResponseAsRead = mutation({
-  args: { responseId: v.id('query_responses') },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.responseId, { isRead: true });
-    return args.responseId;
-  },
-});
-
 export const getUsersByRole = query({
-  args: { role: v.union(v.literal('admin'), v.literal('hr'), v.literal('candidate')) },
+  args: { role: v.union(v.literal('admin'), v.literal('hr')) },
   handler: async (ctx, args) => {
     const users = await ctx.db
       .query('users')

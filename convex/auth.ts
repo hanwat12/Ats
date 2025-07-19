@@ -71,11 +71,6 @@ export const getCurrentUser = query({
     const user = await ctx.db.get(args.userId);
     if (!user) return null;
 
-    let profileImageUrl = null;
-    if (user.profileImage) {
-      profileImageUrl = `https://images.convex.cloud/${user.profileImage}`;
-    }
-
     return {
       _id: user._id,
       firstName: user.firstName,
@@ -83,27 +78,6 @@ export const getCurrentUser = query({
       email: user.email,
       role: user.role,
       phone: user.phone,
-      profileImage: profileImageUrl,
     };
-  },
-});
-
-export const updateUser = mutation({
-  args: {
-    userId: v.id('users'),
-    firstName: v.optional(v.string()),
-    lastName: v.optional(v.string()),
-    phone: v.optional(v.string()),
-    profileImage: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const { userId, ...updates } = args;
-
-    const cleanUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, value]) => value !== undefined)
-    );
-
-    await ctx.db.patch(userId, cleanUpdates);
-    return userId;
   },
 });
