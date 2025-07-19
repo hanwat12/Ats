@@ -11,6 +11,7 @@
 import type * as applications from "../applications.js";
 import type * as auth from "../auth.js";
 import type * as candidate from "../candidate.js";
+import type * as candidates from "../candidates.js";
 import type * as createTestUser from "../createTestUser.js";
 import type * as feedback from "../feedback.js";
 import type * as files from "../files.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   applications: typeof applications;
   auth: typeof auth;
   candidate: typeof candidate;
+  candidates: typeof candidates;
   createTestUser: typeof createTestUser;
   feedback: typeof feedback;
   files: typeof files;

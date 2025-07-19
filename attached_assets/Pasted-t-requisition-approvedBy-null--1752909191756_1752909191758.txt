@@ -1,0 +1,450 @@
+t(requisition.approvedBy) : null;
+                                                                               ~~~~~~~~~~
+
+convex/requisitions.ts:125:41 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+125       creatorName: creator ? `${creator.firstName} ${creator.lastName}` : 'Unknown',
+                                            ~~~~~~~~~
+
+convex/requisitions.ts:125:62 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+125       creatorName: creator ? `${creator.firstName} ${creator.lastName}` : 'Unknown',
+                                                                 ~~~~~~~~
+
+convex/requisitions.ts:126:44 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+126       approverName: approver ? `${approver.firstName} ${approver.lastName}` : null,
+                                               ~~~~~~~~~
+
+convex/requisitions.ts:126:66 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+126       approverName: approver ? `${approver.firstName} ${approver.lastName}` : null,
+                                                                     ~~~~~~~~
+
+convex/requisitions.ts:144:45 - error TS2345: Argument of type '"requisition_candidates"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+144     const candidateId = await ctx.db.insert('requisition_candidates', {
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~
+
+convex/requisitions.ts:151:42 - error TS2345: Argument of type 'Id<"requisitions">' is not assignable to parameter of type 'Id<TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vect...'.
+  Type 'Id<"requisitions">' is not assignable to type '{ __tableName: TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndex...'.
+    Types of property '__tableName' are incompatible.
+      Type '"requisitions"' is not assignable to type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+151     const requisition = await ctx.db.get(args.requisitionId);
+                                             ~~~~~~~~~~~~~~~~~~
+
+convex/requisitions.ts:154:29 - error TS2339: Property 'createdBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'createdBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+154         userId: requisition.createdBy,
+                                ~~~~~~~~~
+
+convex/requisitions.ts:156:93 - error TS2339: Property 'jobRole' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobRole' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+156         message: `A new candidate ${args.candidateName} has been uploaded for ${requisition.jobRole} position.`,
+                                                                                                ~~~~~~~
+
+convex/requisitions.ts:157:9 - error TS2322: Type '"general"' is not assignable to type '"candidate_uploaded" | "candidate_shortlisted" | "candidate_confirmed" | "query_sent" | "query_responded"'.
+
+157         type: 'general',
+            ~~~~
+
+  node_modules/convex/dist/esm-types/type_utils.d.ts:11:97
+    11 export type Expand<ObjectType extends Record<any, any>> = ObjectType extends Record<any, any> ? {
+                                                                                                       ~
+    12     [Key in keyof ObjectType]: ObjectType[Key];
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    13 } : never;
+       ~
+    The expected type comes from property 'type' which is declared here on type '{ relatedId?: string | undefined; type: "candidate_uploaded" | "candidate_shortlisted" | "candidate_confirmed" | "query_sent" | "query_responded"; createdAt: number; title: string; message: string; userId: Id<...>; isRead: boolean; }'
+
+convex/requisitions.ts:172:14 - error TS2345: Argument of type '"requisition_candidates"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+172       .query('requisition_candidates')
+                 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+convex/requisitions.ts:173:18 - error TS2345: Argument of type '"by_requisition"' is not assignable to parameter of type '"by_id" | "by_creation_time"'.
+
+173       .withIndex('by_requisition', (q) => q.eq('requisitionId', args.requisitionId))
+                     ~~~~~~~~~~~~~~~~
+
+convex/requisitions.ts:173:48 - error TS2345: Argument of type '"requisitionId"' is not assignable to parameter of type '"_creationTime" | "_id"'.
+
+173       .withIndex('by_requisition', (q) => q.eq('requisitionId', args.requisitionId))
+                                                   ~~~~~~~~~~~~~~~
+
+convex/requisitions.ts:179:53 - error TS2339: Property 'uploadedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'uploadedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+179         const uploader = await ctx.db.get(candidate.uploadedBy);
+                                                        ~~~~~~~~~~
+
+convex/requisitions.ts:180:36 - error TS2339: Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+180         const reviewer = candidate.reviewedBy ? await ctx.db.get(candidate.reviewedBy) : null;
+                                       ~~~~~~~~~~
+
+convex/requisitions.ts:180:76 - error TS2339: Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+180         const reviewer = candidate.reviewedBy ? await ctx.db.get(candidate.reviewedBy) : null;
+                                                                               ~~~~~~~~~~
+
+convex/requisitions.ts:184:48 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+184           uploaderName: uploader ? `${uploader.firstName} ${uploader.lastName}` : 'Unknown',
+                                                   ~~~~~~~~~
+
+convex/requisitions.ts:184:70 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+184           uploaderName: uploader ? `${uploader.firstName} ${uploader.lastName}` : 'Unknown',
+                                                                         ~~~~~~~~
+
+convex/requisitions.ts:185:48 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+185           reviewerName: reviewer ? `${reviewer.firstName} ${reviewer.lastName}` : null,
+                                                   ~~~~~~~~~
+
+convex/requisitions.ts:185:70 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+185           reviewerName: reviewer ? `${reviewer.firstName} ${reviewer.lastName}` : null,
+                                                                         ~~~~~~~~
+
+convex/resumeUpload.ts:18:42 - error TS2345: Argument of type '"resume_uploads"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+18     const uploadId = await ctx.db.insert('resume_uploads', {
+                                            ~~~~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:37:66 - error TS2339: Property 'userId' does not exist on type '{ _id: Id<"candidates">; _creationTime: number; shortlistedAt?: number | undefined; confirmedAt?: number | undefined; email: string; jobId: Id<"jobs">; name: string; experience: number; ... 4 more ...; uploadedAt: number; }'.
+
+37     const candidateUser = candidate ? await ctx.db.get(candidate.userId) : null;
+                                                                    ~~~~~~
+
+convex/resumeUpload.ts:51:37 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+51           message: `${candidateUser.firstName} ${candidateUser.lastName} resume uploaded for ${job?.title || 'General Application'}`,
+                                       ~~~~~~~~~
+
+convex/resumeUpload.ts:51:64 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+51           message: `${candidateUser.firstName} ${candidateUser.lastName} resume uploaded for ${job?.title || 'General Application'}`,
+                                                                  ~~~~~~~~
+
+convex/resumeUpload.ts:52:11 - error TS2322: Type '"resume_upload"' is not assignable to type '"candidate_uploaded" | "candidate_shortlisted" | "candidate_confirmed" | "query_sent" | "query_responded"'.
+
+52           type: 'resume_upload' as const,
+             ~~~~
+
+  node_modules/convex/dist/esm-types/type_utils.d.ts:11:97
+    11 export type Expand<ObjectType extends Record<any, any>> = ObjectType extends Record<any, any> ? {
+                                                                                                       ~
+    12     [Key in keyof ObjectType]: ObjectType[Key];
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    13 } : never;
+       ~
+    The expected type comes from property 'type' which is declared here on type '{ relatedId?: string | undefined; type: "candidate_uploaded" | "candidate_shortlisted" | "candidate_confirmed" | "query_sent" | "query_responded"; createdAt: number; title: string; message: string; userId: Id<...>; isRead: boolean; }'
+
+convex/resumeUpload.ts:67:40 - error TS2345: Argument of type '"resume_uploads"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+67     const uploads = await ctx.db.query('resume_uploads').order('desc').collect();
+                                          ~~~~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:71:51 - error TS2339: Property 'candidateId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'candidateId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+71         const candidate = await ctx.db.get(upload.candidateId);
+                                                     ~~~~~~~~~~~
+
+convex/resumeUpload.ts:72:70 - error TS2339: Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+72         const candidateUser = candidate ? await ctx.db.get(candidate.userId) : null;
+                                                                        ~~~~~~
+
+convex/resumeUpload.ts:73:50 - error TS2339: Property 'uploadedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'uploadedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+73         const uploader = await ctx.db.get(upload.uploadedBy);
+                                                    ~~~~~~~~~~
+
+convex/resumeUpload.ts:74:28 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+74         const job = upload.jobId ? await ctx.db.get(upload.jobId) : null;
+                              ~~~~~
+
+convex/resumeUpload.ts:74:60 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+74         const job = upload.jobId ? await ctx.db.get(upload.jobId) : null;
+                                                              ~~~~~
+
+convex/resumeUpload.ts:75:33 - error TS2339: Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+75         const reviewer = upload.reviewedBy ? await ctx.db.get(upload.reviewedBy) : null;
+                                   ~~~~~~~~~~
+
+convex/resumeUpload.ts:75:70 - error TS2339: Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'reviewedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+75         const reviewer = upload.reviewedBy ? await ctx.db.get(upload.reviewedBy) : null;
+                                                                        ~~~~~~~~~~
+
+convex/resumeUpload.ts:80:32 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+80             ? `${candidateUser.firstName} ${candidateUser.lastName}`
+                                  ~~~~~~~~~
+
+convex/resumeUpload.ts:80:59 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+80             ? `${candidateUser.firstName} ${candidateUser.lastName}`
+                                                             ~~~~~~~~
+
+convex/resumeUpload.ts:82:42 - error TS2339: Property 'email' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'email' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+82           candidateEmail: candidateUser?.email || '',
+                                            ~~~~~
+
+convex/resumeUpload.ts:83:48 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+83           uploaderName: uploader ? `${uploader.firstName} ${uploader.lastName}` : 'Unknown',
+                                                  ~~~~~~~~~
+
+convex/resumeUpload.ts:83:70 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+83           uploaderName: uploader ? `${uploader.firstName} ${uploader.lastName}` : 'Unknown',
+                                                                        ~~~~~~~~
+
+convex/resumeUpload.ts:84:26 - error TS2339: Property 'title' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'title' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+84           jobTitle: job?.title || 'General Application',
+                            ~~~~~
+
+convex/resumeUpload.ts:85:48 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+85           reviewerName: reviewer ? `${reviewer.firstName} ${reviewer.lastName}` : null,
+                                                  ~~~~~~~~~
+
+convex/resumeUpload.ts:85:70 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+85           reviewerName: reviewer ? `${reviewer.firstName} ${reviewer.lastName}` : null,
+                                                                        ~~~~~~~~
+
+convex/resumeUpload.ts:97:40 - error TS2345: Argument of type '"resume_uploads"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+97     const uploads = await ctx.db.query('resume_uploads').order('desc').collect();
+                                          ~~~~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:101:51 - error TS2339: Property 'candidateId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'candidateId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+101         const candidate = await ctx.db.get(upload.candidateId);
+                                                      ~~~~~~~~~~~
+
+convex/resumeUpload.ts:102:70 - error TS2339: Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+102         const candidateUser = candidate ? await ctx.db.get(candidate.userId) : null;
+                                                                         ~~~~~~
+
+convex/resumeUpload.ts:103:50 - error TS2339: Property 'uploadedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'uploadedBy' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+103         const uploader = await ctx.db.get(upload.uploadedBy);
+                                                     ~~~~~~~~~~
+
+convex/resumeUpload.ts:104:28 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+104         const job = upload.jobId ? await ctx.db.get(upload.jobId) : null;
+                               ~~~~~
+
+convex/resumeUpload.ts:104:60 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+104         const job = upload.jobId ? await ctx.db.get(upload.jobId) : null;
+                                                               ~~~~~
+
+convex/resumeUpload.ts:110:48 - error TS2339: Property 'firstName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'firstName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+110           uploaderName: uploader ? `${uploader.firstName} ${uploader.lastName}` : 'Unknown',
+                                                   ~~~~~~~~~
+
+convex/resumeUpload.ts:110:70 - error TS2339: Property 'lastName' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'lastName' does not exist on type '{ _id: Id<"jobs">; _creationTime: number; role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+110           uploaderName: uploader ? `${uploader.firstName} ${uploader.lastName}` : 'Unknown',
+                                                                         ~~~~~~~~
+
+convex/resumeUpload.ts:112:41 - error TS2339: Property 'uploadedAt' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'uploadedAt' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+112           uploadedDate: new Date(upload.uploadedAt || 0).toLocaleDateString(),
+                                            ~~~~~~~~~~
+
+convex/resumeUpload.ts:113:41 - error TS2339: Property 'uploadedAt' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'uploadedAt' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+113           uploadedTime: new Date(upload.uploadedAt || 0).toLocaleTimeString(),
+                                            ~~~~~~~~~~
+
+convex/resumeUpload.ts:131:24 - error TS2345: Argument of type 'Id<"resume_uploads">' is not assignable to parameter of type 'Id<TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vect...'.
+  Type 'Id<"resume_uploads">' is not assignable to type '{ __tableName: TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndex...'.
+    Types of property '__tableName' are incompatible.
+      Type '"resume_uploads"' is not assignable to type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+131     await ctx.db.patch(args.uploadId, {
+                           ~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:138:37 - error TS2345: Argument of type 'Id<"resume_uploads">' is not assignable to parameter of type 'Id<TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vect...'.
+  Type 'Id<"resume_uploads">' is not assignable to type '{ __tableName: TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndex...'.
+    Types of property '__tableName' are incompatible.
+      Type '"resume_uploads"' is not assignable to type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+138     const upload = await ctx.db.get(args.uploadId);
+                                        ~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:141:47 - error TS2339: Property 'candidateId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'candidateId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+141     const candidate = await ctx.db.get(upload.candidateId);
+                                                  ~~~~~~~~~~~
+
+convex/resumeUpload.ts:146:14 - error TS2345: Argument of type '"applications"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+146       .query('applications')
+                 ~~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:149:50 - error TS2339: Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+149           q.eq(q.field('candidateId'), candidate.userId),
+                                                     ~~~~~~
+
+convex/resumeUpload.ts:150:18 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+150           upload.jobId ? q.eq(q.field('jobId'), upload.jobId) : q.eq(q.field('jobId'), upload.jobId)
+                     ~~~~~
+
+convex/resumeUpload.ts:150:56 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+150           upload.jobId ? q.eq(q.field('jobId'), upload.jobId) : q.eq(q.field('jobId'), upload.jobId)
+                                                           ~~~~~
+
+convex/resumeUpload.ts:150:95 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+150           upload.jobId ? q.eq(q.field('jobId'), upload.jobId) : q.eq(q.field('jobId'), upload.jobId)
+                                                                                                  ~~~~~
+
+convex/resumeUpload.ts:155:32 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+155     if (!application && upload.jobId) {
+                                   ~~~~~
+
+convex/resumeUpload.ts:156:49 - error TS2345: Argument of type '"applications"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+156       const applicationId = await ctx.db.insert('applications', {
+                                                    ~~~~~~~~~~~~~~
+
+convex/resumeUpload.ts:157:23 - error TS2339: Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'jobId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+157         jobId: upload.jobId,
+                          ~~~~~
+
+convex/resumeUpload.ts:158:32 - error TS2339: Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; fir
+stName: string; lastName: string; role: "admin" | "hr"; createdAt: number; } | ... 5 more ... | { ...; }'.
+  Property 'userId' does not exist on type '{ _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'.
+
+158         candidateId: candidate.userId,
+                                   ~~~~~~
+
+convex/seedData.ts:87:9 - error TS2322: Type '"candidate"' is not assignable to type '"admin" | "hr"'.
+
+87         role: 'candidate',
+           ~~~~
+
+  node_modules/convex/dist/esm-types/type_utils.d.ts:11:97
+    11 export type Expand<ObjectType extends Record<any, any>> = ObjectType extends Record<any, any> ? {
+                                                                                                       ~
+    12     [Key in keyof ObjectType]: ObjectType[Key];
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    13 } : never;
+       ~
+    The expected type comes from property 'role' which is declared here on type '{ phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }'
+
+convex/seedData.ts:146:41 - error TS2345: Argument of type '{ userId: Id<"users">; skills: string[]; experience: number; education: string; location: string; summary: string; linkedinUrl: string; githubUrl: string; } | { userId: Id<"users">; skills: string[]; ... 5 more ...; githubUrl?: undefined; }' is not assignable to parameter of type '{ shortlistedAt?: number | undefined; confirmedAt?: number | undefined; email: string; jobId: Id<"jobs">; name: string; experience: number; resumeUrl: string; fileName: string; uploadedBy: Id<...>; status: "uploaded" | ... 1 more ... | "confirmed"; uploadedAt: number; }'.
+  Type '{ userId: Id<"users">; skills: string[]; experience: number; education: string; location: string; summary: string; linkedinUrl: string; githubUrl: string; }' is missing the following properties from type '{ shortlistedAt?: number | undefined; confirmedAt?: number | undefined; email: string; jobId: Id<"jobs">; name: string; experience: number; resumeUrl: string; fileName: string; uploadedBy: Id<...>; status: "uploaded" | ... 1 more ... | "confirmed"; uploadedAt: number; }': email, jobId, name, resumeUrl, and 4 more.
+
+146       await ctx.db.insert('candidates', profile);
+                                            ~~~~~~~
+
+convex/seedData.ts:246:49 - error TS2345: Argument of type '{ title: string; description: string; department: string; experienceRequired: number; salaryMin: number; salaryMax: number; location: string; status: "active"; requiredSkills: string[]; postedBy: Id<...>; createdAt: number; } | { ...; }' is not assignable to parameter of type '{ role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+  Property 'role' is missing in type '{ title: string; description: string; department: string; experienceRequired: number; salaryMin: number; salaryMax: number; location: string; status: "active"; requiredSkills: string[]; postedBy: Id<...>; createdAt: number; }' but required in type '{ role: string; createdAt: number; title: string; location: string; description: string; postedBy: Id<"users">; }'.
+
+246       const jobId = await ctx.db.insert('jobs', job);
+                                                    ~~~
+
+convex/seedData.ts:311:49 - error TS2345: Argument of type '"applications"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+311       const applicationId = await ctx.db.insert('applications', application);
+                                                    ~~~~~~~~~~~~~~
+
+convex/seedData.ts:350:27 - error TS2345: Argument of type '"interviews"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+350       await ctx.db.insert('interviews', interview);
+                              ~~~~~~~~~~~~
+
+convex/seedData.ts:370:43 - error TS2345: Argument of type '"interviews"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+370     const interviews = await ctx.db.query('interviews').collect();
+                                              ~~~~~~~~~~~~
+
+convex/seedData.ts:375:45 - error TS2345: Argument of type '"applications"' is not assignable to parameter of type 'TableNamesInDataModel<{ users: { document: { _id: Id<"users">; _creationTime: number; phone?: string | undefined; email: string; password: string; firstName: string; lastName: string; role: "admin" | "hr"; createdAt: number; }; fieldPaths: ExtractFieldPaths<...> | "_id"; indexes: { ...; }; searchIndexes: {}; vectorI...'.
+
+375     const applications = await ctx.db.query('applications').collect();
+                                                ~~~~~~~~~~~~~~
+
+
+Found 303 errors in 12 files.
+
+Errors  Files
+    45  convex/applications.ts:15
+   128  convex/candidate.ts:34
+     2  convex/createTestUser.ts:24
+     4  convex/files.ts:13
+     2  convex/fixLogin.ts:64
+    12  convex/interviews.ts:14
+    12  convex/materData.ts:22
+     2  convex/quickFix.ts:33
+     3  convex/quickSetup.ts:33
+    43  convex/requisitions.ts:16
+    43  convex/resumeUpload.ts:18
+     7  convex/seedData.ts:87
